@@ -1,2 +1,3 @@
-# prox-assist-scripts
-Just some usefull scripts for Proxmox VE
+# Server-Assist-Scripts
+
+Just some usefull scripts for Proxmox VE and different services
