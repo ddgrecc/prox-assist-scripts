@@ -2,8 +2,13 @@
 ####################################################################
 #  How to use:
 #  ./lxc_snapshot-with-mappings.sh <ID1> <ID2> <ID3> <...>
+#  or
+#  ./lxc_snapshot-with-mappings.sh all
+#  or
+#  ./lxc_snapshot-with-mappings.sh running
 #
 ####################################################################
+
 # Function to list available LXCs
 list_lxcs() {
   echo "Es wurden keine Container definiert."
@@ -11,14 +16,27 @@ list_lxcs() {
   pct list | grep -E '^\s*[0-9]' | awk '{print $1 "\t" $2}'
 }
 
-# Check if at least one LXC ID is provided
+# Function to get all LXC IDs
+get_all_lxc_ids() {
+  pct list | grep -E '^\s*[0-9]' | awk '{print $1}'
+}
+
+# Function to get running LXC IDs
+get_running_lxc_ids() {
+  pct list | grep -E '^\s*[0-9]' | awk '$2 ~ /running/ {print $1}'
+}
+
+# Check if at least one LXC ID is provided or 'all'/'running' is specified
 if [ "$#" -eq 0 ]; then
   list_lxcs
   exit 1
+elif [ "$1" == "all" ]; then
+  LXC_IDS=($(get_all_lxc_ids))
+elif [ "$1" == "running" ]; then
+  LXC_IDS=($(get_running_lxc_ids))
+else
+  LXC_IDS=("$@")
 fi
-
-# Array of LXC IDs passed as arguments
-LXC_IDS=("$@")
 
 # Function to remove mount points from LXC config file
 remove_mounts() {
@@ -83,5 +101,8 @@ for lxc_id in "${LXC_IDS[@]}"; do
   
   echo "LXC $lxc_id processing completed."
 done
+
+echo "All specified LXCs processed."
+
 
 echo "All specified LXCs processed."
